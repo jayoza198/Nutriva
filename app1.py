@@ -163,7 +163,6 @@ def search_exporter_page(df):
             st.markdown("Invalid Indian exporter. Please enter a valid exporter.")
     
 
-# Function to search for an importer
 def search_importer_page(df, foreign_company):
     st.title("Search Importer")
     foreign_company_name = st.text_input("Enter the foreign company:")
@@ -198,8 +197,7 @@ def search_importer_page(df, foreign_company):
             st.markdown(df_importer.to_markdown(index=False))
         else:
             st.markdown("Invalid foreign importer. Please enter a valid importer.")
-    
-    
+
 # Function to search for an importer
 # def search_importer_page():
 #     st.title("Search Importer")
@@ -220,14 +218,16 @@ def main():
     st.markdown("### Welcome to the Nutriva Lifesciences Analysis App!")
 
     pages = {
-    "Top Exporters": top_exporters_page,
-    "Top Importers": top_importers_page,
-    "Top Products": top_products_page,
-    "Top Products by Country": display_top_products_by_country_page,
-    "Top Foreign Companies": display_top_foreign_companies_page,
-    "Search Exporter": lambda: search_exporter_page(df),
-    "Search Importer": lambda: search_importer_page(df)
-}
+        "Top Exporters": top_exporters_page,
+        "Top Importers": top_importers_page,
+        "Top Products": top_products_page,
+        "Top Products by Country": display_top_products_by_country_page,
+        "Top Foreign Companies": display_top_foreign_companies_page,
+        "Search Exporter": lambda: search_exporter_page(df),
+        "Search Importer": lambda: search_importer_page(df, "foreign_company")
+    }
+
+
 
 
     # Add a sidebar to the app
