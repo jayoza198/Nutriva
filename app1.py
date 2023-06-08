@@ -164,7 +164,7 @@ def search_exporter_page(df):
     
 
 # Function to search for an importer
-def search_importer(df, foreign_company):
+def search_importer_page(df, foreign_company):
     st.title("Search Importer")
     foreign_company_name = st.text_input("Enter the foreign company:")
 
