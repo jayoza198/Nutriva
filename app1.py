@@ -7,7 +7,7 @@ from IPython.display import display, Markdown
 # @st.cache(allow_output_mutation=True)
 # df = pd.read_excel("FF 2018 (1).xlsb", engine = "pyxlsb")
 
-@st.cache(allow_output_mutation=True)
+@st.cache_data
 def load_data():
     df = pd.read_excel("FF 2018 (1).xlsb", engine="pyxlsb")
     return df
@@ -49,10 +49,9 @@ def top_importers_page():
     st.markdown("### Top Importers")
     st.dataframe(df_importers)
 
-# Function to get the top products
 def get_top_products(num_products):
     top_products = df.groupby('Product')['FOB INR'].sum().nlargest(num_products)
-    products_data = [[product[:50], count, f"{inr:,.2f}"] for product, count, inr in zip(top_products.index, top_products.values, top_products)]
+    products_data = [[product, f"{inr:,.2f}"] for product, inr in zip(top_products.index, top_products.values)]
     return products_data
 
 # Function to display the top products
@@ -62,9 +61,29 @@ def top_products_page():
     
     products_data = get_top_products(num_products)
     df_products = pd.DataFrame(products_data, columns=["Product", "FOB INR"])
+    df_products = df_products.sort_values('FOB INR', ascending=False)  # Sort by FOB INR
     
     st.markdown("### Top Products")
     st.dataframe(df_products)
+
+# def get_top_products(num_products):
+#     top_products = df.groupby('Product')['FOB INR'].sum().nlargest(num_products)
+#     products_data = [[product, f"{inr:,.2f}"] for product, inr in zip(top_products.index, top_products.values)]
+#     return products_data
+
+# # Function to display the top products
+# def top_products_page():
+#     st.title("Top Products")
+#     num_products = st.number_input("Enter the number of top products to display:", min_value=0, value=0)
+    
+#     products_data = get_top_products(num_products)
+#     df_products = pd.DataFrame(products_data, columns=["Product", "FOB INR"])
+#     df_products = df_products.sort_values('FOB INR', ascending=False)  # Sort by FOB INR
+#     df_products = df_products.reset_index(drop=True)  # Reset the index
+    
+#     st.markdown("### Top Products")
+#     st.dataframe(df_products)
+
 
 # Function to display top products by country
 def display_top_products_by_country_page():
