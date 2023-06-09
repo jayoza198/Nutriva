@@ -4,7 +4,14 @@ import streamlit as st
 from tabulate import tabulate
 from IPython.display import display, Markdown
 
-df = pd.read_excel("FF 2018 (1).xlsb", engine = "pyxlsb")
+# @st.cache(allow_output_mutation=True)
+# df = pd.read_excel("FF 2018 (1).xlsb", engine = "pyxlsb")
+
+@st.cache_data
+def load_data():
+    df = pd.read_excel("FF 2018 (1).xlsb", engine="pyxlsb")
+    return df
+df = load_data()
 
 # Function to get the top exporters
 def get_top_exporters(num_exporters):
@@ -16,7 +23,7 @@ def get_top_exporters(num_exporters):
 # Function to display the top exporters
 def top_exporters_page():
     st.title("Top Exporters")
-    num_exporters = st.number_input("Enter the number of top exporters to display:", min_value=1, value=5)
+    num_exporters = st.number_input("Enter the number of top exporters to display:", min_value=0, value=0)
     
     exporters_data = get_top_exporters(num_exporters)
     df_exporters = pd.DataFrame(exporters_data, columns=["Exporter", "FOB INR"])
@@ -34,7 +41,7 @@ def get_top_importers(num_importers):
 # Function to display the top importers
 def top_importers_page():
     st.title("Top Importers")
-    num_importers = st.number_input("Enter the number of top importers to display:", min_value=1, value=5)
+    num_importers = st.number_input("Enter the number of top importers to display:", min_value=0, value=0)
     
     importers_data = get_top_importers(num_importers)
     df_importers = pd.DataFrame(importers_data, columns=["Importer", "FOB INR"])
@@ -51,7 +58,7 @@ def get_top_products(num_products):
 # Function to display the top products
 def top_products_page():
     st.title("Top Products")
-    num_products = st.number_input("Enter the number of top products to display:", min_value=1, value=5)
+    num_products = st.number_input("Enter the number of top products to display:", min_value=0, value=0)
     
     products_data = get_top_products(num_products)
     df_products = pd.DataFrame(products_data, columns=["Product", "Count", "FOB INR"])
@@ -62,8 +69,8 @@ def top_products_page():
 # Function to display top products by country
 def display_top_products_by_country_page():
     st.title("Top Products by Country")
-    num_countries = st.number_input("Enter the number of countries:", min_value=1, value=5)
-    num_products = st.number_input("Enter the number of products:", min_value=1, value=5)
+    num_countries = st.number_input("Enter the number of countries:", min_value=0, value=0)
+    num_products = st.number_input("Enter the number of products:", min_value=0, value=0)
     
     grouped_data = df.groupby(['ForeignCountry', 'Product'])['FOB INR'].sum(numeric_only=True).reset_index()
     top_countries = grouped_data.groupby('ForeignCountry')['FOB INR'].sum().nlargest(num_countries).index
@@ -79,7 +86,7 @@ def display_top_products_by_country_page():
 # Function to display top foreign companies
 def display_top_foreign_companies_page():
     st.title("Top Foreign Companies")
-    num_companies = st.number_input("Enter the number of foreign companies:", min_value=1, value=5)
+    num_companies = st.number_input("Enter the number of foreign companies:", min_value=0, value=0)
     
     top_companies = df.groupby('ForeignCompany')['FOB INR'].sum().nlargest(num_companies).reset_index()
     top_companies['FOB INR'] = top_companies['FOB INR'].apply(lambda x: f"{x:,.2f}")
