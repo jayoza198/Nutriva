@@ -61,7 +61,7 @@ def top_products_page():
     num_products = st.number_input("Enter the number of top products to display:", min_value=0, value=0)
     
     products_data = get_top_products(num_products)
-    df_products = pd.DataFrame(products_data, columns=["Product", "Count", "FOB INR"])
+    df_products = pd.DataFrame(products_data, columns=["Product", "FOB INR"])
     
     st.markdown("### Top Products")
     st.dataframe(df_products)
