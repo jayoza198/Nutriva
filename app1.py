@@ -3,11 +3,13 @@ import numpy as np
 import streamlit as st
 from tabulate import tabulate
 from IPython.display import display, Markdown
+import base64
+from io import BytesIO
 
 # @st.cache(allow_output_mutation=True)
 # df = pd.read_excel("FF 2018 (1).xlsb", engine = "pyxlsb")
 
-@st.cache(allow_output_mutation=True)
+@st.cache_data
 def load_data():
     df = pd.read_excel("FF 2018 (1).xlsb", engine="pyxlsb")
     return df
@@ -31,6 +33,16 @@ def top_exporters_page():
     st.markdown("### Top Exporters")
     st.dataframe(df_exporters)
 
+    # Download button
+    excel_exporters = BytesIO()
+    with pd.ExcelWriter(excel_exporters, engine="xlsxwriter") as writer:
+        df_exporters.to_excel(writer, index=False)
+    excel_exporters.seek(0)
+    b64_exporters = base64.b64encode(excel_exporters.read()).decode()
+    href_exporters = f'<a href="data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64,{b64_exporters}" download="top_exporters.xlsx">Download as Excel File</a>'
+    st.markdown(href_exporters, unsafe_allow_html=True)
+
+
 # Function to get the top importers
 def get_top_importers(num_importers):
     top_importers = df.groupby('ForeignCompany')['FOB INR'].sum().nlargest(num_importers).reset_index()
@@ -49,10 +61,30 @@ def top_importers_page():
     st.markdown("### Top Importers")
     st.dataframe(df_importers)
 
+    # Download Button
+    excel_importers = BytesIO()
+    with pd.ExcelWriter(excel_importers, engine="xlsxwriter") as writer:
+        df_importers.to_excel(writer, index=False)
+    excel_importers.seek(0)
+    b64_importers = base64.b64encode(excel_importers.read()).decode()
+    href_importers = f'<a href="data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64,{b64_importers}" download="top_importers.xlsx">Download as Excel File</a>'
+    st.markdown(href_importers, unsafe_allow_html=True)
+
 def get_top_products(num_products):
     top_products = df.groupby('Product')['FOB INR'].sum().nlargest(num_products)
     products_data = [[product, f"{inr:,.2f}"] for product, inr in zip(top_products.index, top_products.values)]
     return products_data
+
+    # Download button
+    excel_products = BytesIO()
+    with pd.ExcelWriter(excel_products, engine="xlsxwriter") as writer:
+        df_products.to_excel(writer, index=False)
+    excel_products.seek(0)
+    b64_products = base64.b64encode(excel_products.read()).decode()
+    href_products = f'<a href="data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64,{b64_products}" download="top_products.xlsx">Download as Excel File</a>'
+    st.markdown(href_products, unsafe_allow_html=True)
+
+    
 
 # Function to display the top products
 def top_products_page():
@@ -65,6 +97,15 @@ def top_products_page():
     
     st.markdown("### Top Products")
     st.dataframe(df_products)
+
+    # Download button
+    excel_products = BytesIO()
+    with pd.ExcelWriter(excel_products, engine="xlsxwriter") as writer:
+        df_products.to_excel(writer, index=False)
+    excel_products.seek(0)
+    b64_products = base64.b64encode(excel_products.read()).decode()
+    href_products = f'<a href="data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64,{b64_products}" download="top_products.xlsx">Download as Excel File</a>'
+    st.markdown(href_products, unsafe_allow_html=True)
 
 # def get_top_products(num_products):
 #     top_products = df.groupby('Product')['FOB INR'].sum().nlargest(num_products)
@@ -101,6 +142,15 @@ def display_top_products_by_country_page():
         products = grouped_data[grouped_data['ForeignCountry'] == country].nlargest(num_products, 'FOB INR')
         products = products[['Product', 'FOB INR']]
         st.dataframe(products)
+        
+        # Download button for each country
+        excel_products_by_country = BytesIO()
+        with pd.ExcelWriter(excel_products_by_country, engine="xlsxwriter") as writer:
+            products.to_excel(writer, index=False)
+        excel_products_by_country.seek(0)
+        b64_products_by_country = base64.b64encode(excel_products_by_country.read()).decode()
+        href_products_by_country = f'<a href="data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64,{b64_products_by_country}" download="top_products_{country.replace(" ", "_")}.xlsx">Download {country} Products as Excel File</a>'
+        st.markdown(href_products_by_country, unsafe_allow_html=True)
 
 # Function to display top foreign companies
 def display_top_foreign_companies_page():
@@ -113,6 +163,14 @@ def display_top_foreign_companies_page():
     st.markdown("### Top Foreign Companies")
     st.dataframe(top_companies)
 
+    # Download button
+    excel_top_companies = BytesIO()
+    with pd.ExcelWriter(excel_top_companies, engine="xlsxwriter") as writer:
+        top_companies.to_excel(writer, index=False)
+    excel_top_companies.seek(0)
+    b64_top_companies = base64.b64encode(excel_top_companies.read()).decode()
+    href_top_companies = f'<a href="data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64,{b64_top_companies}" download="top_foreign_companies.xlsx">Download as Excel File</a>'
+    st.markdown(href_top_companies, unsafe_allow_html=True)
 # # Function to search for an exporter
 # def search_exporter_page():
 #     st.title("Search Exporter")
@@ -187,7 +245,17 @@ def search_exporter_page(df):
             st.markdown(f"Total FOB INR for all transactions: {format(total_fob_inr, ',')}")
         else:
             st.markdown("Invalid Indian exporter. Please enter a valid exporter.")
+    else:
+        filtered_df = pd.DataFrame()  # Create an empty DataFrame when exporter_name is not entered
     
+    # Download button
+    excel_exporter = BytesIO()
+    with pd.ExcelWriter(excel_exporter, engine="xlsxwriter") as writer:
+        filtered_df.to_excel(writer, index=False)
+    excel_exporter.seek(0)
+    b64_exporter = base64.b64encode(excel_exporter.read()).decode()
+    href_exporter = f'<a href="data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64,{b64_exporter}" download="exporter_details.xlsx">Download as Excel File</a>'
+    st.markdown(href_exporter, unsafe_allow_html=True)
 
 def search_importer_page(df, foreign_company):
     st.title("Search Importer")
@@ -223,7 +291,18 @@ def search_importer_page(df, foreign_company):
             st.markdown(df_importer.to_markdown(index=False))
         else:
             st.markdown("Invalid foreign importer. Please enter a valid importer.")
-
+    
+    else:
+        df_importer = pd.DataFrame()  # Create an empty DataFrame when foreign_company_name is not entered
+    
+    # Download button
+    excel_importer = BytesIO()
+    with pd.ExcelWriter(excel_importer, engine="xlsxwriter") as writer:
+        df_importer.to_excel(writer, index=False)
+    excel_importer.seek(0)
+    b64_importer = base64.b64encode(excel_importer.read()).decode()
+    href_importer = f'<a href="data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64,{b64_importer}" download="importer_details.xlsx">Download as Excel File</a>'
+    st.markdown(href_importer, unsafe_allow_html=True)
 # Function to search for an importer
 # def search_importer_page():
 #     st.title("Search Importer")
