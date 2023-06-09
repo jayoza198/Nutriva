@@ -7,7 +7,7 @@ from IPython.display import display, Markdown
 # @st.cache(allow_output_mutation=True)
 # df = pd.read_excel("FF 2018 (1).xlsb", engine = "pyxlsb")
 
-@st.cache_data
+@st.cache(allow_output_mutation=True)
 def load_data():
     df = pd.read_excel("FF 2018 (1).xlsb", engine="pyxlsb")
     return df
