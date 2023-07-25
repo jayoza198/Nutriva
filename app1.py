@@ -318,8 +318,8 @@ def search_importer_page(df, foreign_company):
 #             st.markdown("Importer not found.")
 
 # Function to search for a product
-def search_product_page(df):
-    st.title("Search Product")
+def search_product_page_importer(df):
+    st.title("Search Product by Importer")
     product_name = st.text_input("Enter the product name:")
     
     if product_name:
@@ -336,7 +336,49 @@ def search_product_page(df):
 
             # Display the results in a tabular format
             table_data = grouped_data.values.tolist()
-            headers = ['Foreign Company', 'FOB INR']
+            headers = ['Importers', 'FOB INR']
+
+            # Format FOB INR values with commas and 2 decimal places
+            formatted_table_data = [[company, f"{inr:,.2f}"] for company, inr in table_data]
+
+            st.markdown("### Product Details")
+            st.markdown(f"#### Product Name: {product_name}")
+            st.markdown(tabulate(formatted_table_data, headers=headers, tablefmt='pipe'))
+        else:
+            st.markdown("Product not found.")
+    else:
+        filtered_df = pd.DataFrame()  # Create an empty DataFrame when product_name is not entered
+    
+    # Download button
+    excel_product = BytesIO()
+    with pd.ExcelWriter(excel_product, engine="xlsxwriter") as writer:
+        filtered_df.to_excel(writer, index=False)
+    excel_product.seek(0)
+    b64_product = base64.b64encode(excel_product.read()).decode()
+    href_product = f'<a href="data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64,{b64_product}" download="product_details.xlsx">Download as Excel File</a>'
+    st.markdown(href_product, unsafe_allow_html=True)
+
+
+# Function to search for a product
+def search_product_page_exporter(df):
+    st.title("Search Product by Exporter")
+    product_name = st.text_input("Enter the product name:")
+    
+    if product_name:
+        # Check if the input product name is in the DataFrame
+        if df['Product'].str.contains(product_name, case=False).any():
+            # Filter the DataFrame for the selected product
+            filtered_df = df[df['Product'].str.contains(product_name, case=False)]
+
+            # Group the data by Foreign Company
+            grouped_data = filtered_df.groupby(['IndianCompany'])['FOB INR'].sum().reset_index()
+
+            # Sort the data by FOB INR column in descending order
+            grouped_data = grouped_data.sort_values('FOB INR', ascending=False)
+
+            # Display the results in a tabular format
+            table_data = grouped_data.values.tolist()
+            headers = ['Exporters', 'FOB INR']
 
             # Format FOB INR values with commas and 2 decimal places
             formatted_table_data = [[company, f"{inr:,.2f}"] for company, inr in table_data]
@@ -371,7 +413,8 @@ def main():
         "Top Foreign Companies": display_top_foreign_companies_page,
         "Search Exporter": lambda: search_exporter_page(df),
         "Search Importer": lambda: search_importer_page(df, "foreign_company"),
-        "Search Product": lambda: search_product_page(df)
+        "Search Product Importer": lambda: search_product_page_importer(df),
+        "Search Product Exporter": lambda: search_product_page_exporter(df)
     }
 
 
