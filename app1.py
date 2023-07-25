@@ -370,7 +370,7 @@ def main():
         "Top Products by Country": display_top_products_by_country_page,
         "Top Foreign Companies": display_top_foreign_companies_page,
         "Search Exporter": lambda: search_exporter_page(df),
-        "Search Importer": lambda: search_importer_page(df, "foreign_company),
+        "Search Importer": lambda: search_importer_page(df, "foreign_company"),
         "Search Product": lambda: search_product_page(df)
     }
 
